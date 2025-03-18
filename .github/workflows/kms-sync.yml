@@ -31,7 +31,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install node-fetch cloudflare node-kms-client
+        run: npm install node-fetch cloudflare
 
       - name: Run KMS sync script
         env:
