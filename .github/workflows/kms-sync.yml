@@ -1,44 +1,33 @@
-name: KMS Server Sync
+name: Sync KMS Server
 
 on:
   schedule:
-    - cron: '0 0 * * 0'
-  workflow_dispatch:
+    - cron: '0 */12 * * *'  # 每12小时运行一次
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Set up Node.js
+        
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-
+          node-version: '16'
+          
       - name: Install dependencies
-        run: npm install node-fetch@2 cloudflare@2.9.1
-
-      - name: Verify environment variables
-        run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-            echo "Error: CLOUDFLARE_API_TOKEN is not set"
-            exit 1
-          fi
-          if [ -z "$CLOUDFLARE_ZONE_ID" ]; then
-            echo "Error: CLOUDFLARE_ZONE_ID is not set"
-            exit 1
-          fi
-          echo "Environment variables verified"
+        run: npm ci
+        
+      - name: Install netcat
+        run: sudo apt-get update && sudo apt-get install -y netcat
+        
+      - name: Run KMS server sync
+        run: node main.js
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-
-      - name: Run KMS sync script
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-          DNS_RECORD_NAME: kms.everyhub.top
-          NODE_DEBUG: "http,https,net"
-        run: node kms-sync.js
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
