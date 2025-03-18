@@ -4,19 +4,6 @@ on:
   schedule:
     - cron: '0 0 * * 0'  # 每周日 00:00 UTC 触发
   workflow_dispatch: # 添加 workflow_dispatch 触发器
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: false
-        default: 'info'
-        type: choice
-        options:
-        - info
-        - debug
-      environment:
-        description: 'Environment to deploy to'
-        type: environment
-        required: false
 
 jobs:
   sync:
@@ -31,11 +18,24 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install node-fetch cloudflare
+        run: npm install node-fetch@2 cloudflare@2.9.1
+
+      - name: Verify environment variables
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "Error: CLOUDFLARE_API_TOKEN is not set"
+            exit 1
+          fi
+          if [ -z "$CLOUDFLARE_ZONE_ID" ]; then
+            echo "Error: CLOUDFLARE_ZONE_ID is not set"
+            exit 1
+          fi
+          echo "Environment variables verified"
 
       - name: Run KMS sync script
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-          DNS_RECORD_NAME: kms.everyhub.top # 替换为你的 DNS 记录名称
+          DNS_RECORD_NAME: kms.everyhub.top
+          NODE_DEBUG: "http,https,net" # 添加Node.js调试输出
         run: node kms-sync.js
