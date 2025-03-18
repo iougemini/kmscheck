@@ -3,6 +3,20 @@ name: KMS Server Sync
 on:
   schedule:
     - cron: '0 0 * * 0'  # 每周日 00:00 UTC 触发
+  workflow_dispatch: # 添加 workflow_dispatch 触发器
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: false
+        default: 'info'
+        type: choice
+        options:
+        - info
+        - debug
+      environment:
+        description: 'Environment to deploy to'
+        type: environment
+        required: false
 
 jobs:
   sync:
