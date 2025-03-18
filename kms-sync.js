@@ -218,7 +218,6 @@ main().catch(error => {
   console.error('Unhandled error:', error);
   process.exit(1);
 });
-const fetch = require('node-fetch');
 const Cloudflare = require('cloudflare');
 const net = require('net');
 
