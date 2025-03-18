@@ -1,0 +1,22 @@
+{
+  "name": "kms-sync",
+  "version": "1.0.0",
+  "description": "Sync KMS server addresses to Cloudflare DNS",
+  "main": "kms-sync.js",
+  "scripts": {
+    "start": "node kms-sync.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "kms",
+    "cloudflare",
+    "dns",
+    "sync"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cloudflare": "^2.9.1",
+    "node-fetch": "^2.6.7"
+  }
+}
