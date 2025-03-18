@@ -1,0 +1,27 @@
+name: KMS Server Sync
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # 每周日 00:00 UTC 触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install node-fetch cloudflare node-kms-client
+
+      - name: Run KMS sync script
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          DNS_RECORD_NAME: kms.everyhub.top # 替换为你的 DNS 记录名称
+        run: node kms-sync.js
